@@ -9,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>Memory Sequence Game</title>
+    <title>Sequence Memory</title>
 
     <link
         rel="stylesheet"
@@ -21,7 +21,7 @@
 
     <div class="game-container">
 
-        <h1>Memory Sequence Game</h1>
+        <h1>Sequence Memory</h1>
 
         <div class="stats">
 
@@ -37,10 +37,32 @@
 
         </div>
 
-        <div id="card-container"></div>
+        <div class="board">
 
-        <div id="center-display">
-            Start
+            <button
+                class="game-button top"
+                data-id="0">
+            </button>
+
+            <button
+                class="game-button left"
+                data-id="1">
+            </button>
+
+            <button
+                class="game-button right"
+                data-id="2">
+            </button>
+
+            <button
+                class="game-button bottom"
+                data-id="3">
+            </button>
+
+            <div id="center-display">
+                Start
+            </div>
+
         </div>
 
     </div>
