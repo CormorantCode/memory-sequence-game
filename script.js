@@ -1,49 +1,8 @@
-// ====================
-// CONFIGURATION
-// ====================
+const NUM_BUTTONS = 4;
 
-const GRID_COLUMNS = 3;
-const GRID_ROWS = 2;
-
-const NUM_CARDS =
-    GRID_COLUMNS *
-    GRID_ROWS;
-
-// Timing
-
-const PLAYBACK_FLASH_MS = 400;
-const PLAYBACK_GAP_MS = 100;
-
-const CLICK_FLASH_MS = 150;
-
-const ROUND_COMPLETE_DELAY_MS = 500;
-
-const START_DELAY_MS = 500;
-
-// ====================
-// CARD IMAGES
-// ====================
-
-const cardImages = [
-
-    "images/card1.png",
-    "images/card2.png",
-    "images/card3.png",
-    "images/card4.png",
-
-    "images/card5.png",
-    "images/card6.png",
-    "images/card7.png",
-    "images/card8.png"
-];
-
-// ====================
-// DOM ELEMENTS
-// ====================
-
-const cardContainer =
-    document.getElementById(
-        "card-container"
+const buttons =
+    document.querySelectorAll(
+        ".game-button"
     );
 
 const scoreElement =
@@ -61,26 +20,12 @@ const centerDisplay =
         "center-display"
     );
 
-// ====================
-// GAME STATE
-// ====================
-
 let sequence = [];
-
 let playerSequence = [];
 
 let score = 0;
 
 let acceptingInput = false;
-
-// ====================
-// INITIALIZE
-// ====================
-
-cardContainer.style.gridTemplateColumns =
-    `repeat(${GRID_COLUMNS}, auto)`;
-
-createCards();
 
 updateBestScore();
 
@@ -89,61 +34,17 @@ centerDisplay.addEventListener(
     startGame
 );
 
-// ====================
-// CREATE CARDS
-// ====================
+buttons.forEach(button => {
 
-function createCards() {
-
-    cardContainer.innerHTML = "";
-
-    for (
-        let i = 0;
-        i < NUM_CARDS;
-        i++
-    ) {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.className =
-            "game-card";
-
-        button.dataset.id =
-            i;
-
-        button.innerHTML =
-            `<img src="${cardImages[i]}">`;
-
-        button.addEventListener(
-            "click",
-            handleCardClick
-        );
-
-        cardContainer.appendChild(
-            button
-        );
-    }
-}
-
-function getCards() {
-
-    return document.querySelectorAll(
-        ".game-card"
+    button.addEventListener(
+        "click",
+        handleButtonClick
     );
-}
-
-// ====================
-// START GAME
-// ====================
+});
 
 function startGame() {
 
     sequence = [];
-
-    playerSequence = [];
 
     score = 0;
 
@@ -154,23 +55,18 @@ function startGame() {
         i < 3;
         i++
     ) {
-
         addStep();
     }
 
     playSequence();
 }
 
-// ====================
-// SEQUENCE
-// ====================
-
 function addStep() {
 
     const nextStep =
         Math.floor(
             Math.random() *
-            NUM_CARDS
+            NUM_BUTTONS
         );
 
     sequence.push(
@@ -185,23 +81,18 @@ async function playSequence() {
     centerDisplay.textContent =
         "Watch";
 
-    await sleep(
-        START_DELAY_MS
-    );
+    await sleep(800);
 
     for (
         const step
         of sequence
     ) {
 
-        await flashCard(
-            step,
-            PLAYBACK_FLASH_MS
+        await flashButton(
+            step
         );
 
-        await sleep(
-            PLAYBACK_GAP_MS
-        );
+        await sleep(150);
     }
 
     playerSequence = [];
@@ -212,32 +103,23 @@ async function playSequence() {
     acceptingInput = true;
 }
 
-async function flashCard(
-    index,
-    duration
-) {
+async function flashButton(index) {
 
-    const card =
-        getCards()[index];
+    const button =
+        buttons[index];
 
-    card.classList.add(
+    button.classList.add(
         "active"
     );
 
-    await sleep(
-        duration
-    );
+    await sleep(400);
 
-    card.classList.remove(
+    button.classList.remove(
         "active"
     );
 }
 
-// ====================
-// PLAYER INPUT
-// ====================
-
-function handleCardClick(event) {
+function handleButtonClick(event) {
 
     if (
         !acceptingInput
@@ -250,10 +132,7 @@ function handleCardClick(event) {
             event.currentTarget.dataset.id
         );
 
-    flashCard(
-        value,
-        CLICK_FLASH_MS
-    );
+    flashButton(value);
 
     playerSequence.push(
         value
@@ -276,7 +155,6 @@ function checkInput() {
     ) {
 
         gameOver();
-
         return;
     }
 
@@ -292,10 +170,6 @@ function checkInput() {
     }
 }
 
-// ====================
-// ROUND COMPLETE
-// ====================
-
 async function roundComplete() {
 
     acceptingInput = false;
@@ -308,25 +182,19 @@ async function roundComplete() {
     centerDisplay.textContent =
         `Round ${score}`;
 
-    await sleep(
-        ROUND_COMPLETE_DELAY_MS
-    );
+    await sleep(1000);
 
     addStep();
 
     playSequence();
 }
 
-// ====================
-// GAME OVER
-// ====================
-
 function gameOver() {
 
     acceptingInput = false;
 
     centerDisplay.textContent =
-        `Game Over (${score})`;
+        `Game Over`;
 
     const best =
         Number(
@@ -348,10 +216,6 @@ function gameOver() {
     }
 }
 
-// ====================
-// SCORES
-// ====================
-
 function updateScore() {
 
     scoreElement.textContent =
@@ -365,10 +229,6 @@ function updateBestScore() {
             "bestScore"
         ) || 0;
 }
-
-// ====================
-// UTILITY
-// ====================
 
 function sleep(ms) {
 
