@@ -9,7 +9,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>Sequence Memory</title>
+    <title>Flower Sequence Game</title>
 
     <link
         rel="stylesheet"
@@ -21,50 +21,45 @@
 
     <div class="game-container">
 
-        <h1>Sequence Memory</h1>
-
-        <div class="stats">
-
-            <span>
-                Score:
-                <span id="score">0</span>
-            </span>
-
-            <span>
-                Best:
-                <span id="best-score">0</span>
-            </span>
-
-        </div>
-
-        <div class="board">
+        <div id="flower-board">
 
             <button
-                class="game-button top-left"
+                class="petal petal-1"
                 data-id="0">
             </button>
 
             <button
-                class="game-button top-right"
+                class="petal petal-2"
                 data-id="1">
             </button>
 
             <button
-                class="game-button bottom-left"
+                class="petal petal-3"
                 data-id="2">
             </button>
 
             <button
-                class="game-button bottom-right"
+                class="petal petal-4"
                 data-id="3">
             </button>
 
-            <div id="center-display">
-                Start
+            <button
+                class="petal petal-5"
+                data-id="4">
+            </button>
+
+            <div id="center-circle">
+
+                <div id="center-display">
+                    Start
+                </div>
+
             </div>
 
         </div>
 
+        <div id="progress-tracker"></div>
+        
     </div>
 
     <script src="script.js"></script>

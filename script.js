@@ -1,18 +1,14 @@
-const NUM_BUTTONS = 4;
+const MAX_SEQUENCE_LENGTH = 20;
 
-const buttons =
+const WRONG_SHAKE_MS = 2000;
+
+const REVEAL_FLASHES = 3;
+
+const REVEAL_FLASH_MS = 300;
+
+const petals =
     document.querySelectorAll(
-        ".game-button"
-    );
-
-const scoreElement =
-    document.getElementById(
-        "score"
-    );
-
-const bestScoreElement =
-    document.getElementById(
-        "best-score"
+        ".petal"
     );
 
 const centerDisplay =
@@ -21,56 +17,45 @@ const centerDisplay =
     );
 
 let sequence = [];
-let playerSequence = [];
 
-let score = 0;
+let playerSequence = [];
 
 let acceptingInput = false;
 
-updateBestScore();
+const FLASH_MS = 300;
 
 centerDisplay.addEventListener(
     "click",
     startGame
 );
 
-buttons.forEach(button => {
+petals.forEach(
+    petal => {
 
-    button.addEventListener(
-        "click",
-        handleButtonClick
-    );
-});
+        petal.addEventListener(
+            "click",
+            handlePetalClick
+        );
+    }
+);
 
 function startGame() {
 
     sequence = [];
 
-    score = 0;
-
-    updateScore();
-
-    for (
-        let i = 0;
-        i < 3;
-        i++
-    ) {
-        addStep();
-    }
+    addStep();
 
     playSequence();
 }
 
 function addStep() {
 
-    const nextStep =
-        Math.floor(
-            Math.random() *
-            NUM_BUTTONS
-        );
-
     sequence.push(
-        nextStep
+
+        Math.floor(
+            Math.random() * 5
+        )
+
     );
 }
 
@@ -81,18 +66,18 @@ async function playSequence() {
     centerDisplay.textContent =
         "Watch";
 
-    await sleep(800);
+    await sleep(500);
 
     for (
         const step
         of sequence
     ) {
 
-        await flashButton(
+        await flashPetal(
             step
         );
 
-        await sleep(150);
+        await sleep(100);
     }
 
     playerSequence = [];
@@ -103,23 +88,22 @@ async function playSequence() {
     acceptingInput = true;
 }
 
-async function flashButton(index) {
+async function flashPetal(index) {
 
-    const button =
-        buttons[index];
+    petals[index]
+        .classList
+        .add("active");
 
-    button.classList.add(
-        "active"
+    await sleep(
+        FLASH_MS
     );
 
-    await sleep(400);
-
-    button.classList.remove(
-        "active"
-    );
+    petals[index]
+        .classList
+        .remove("active");
 }
 
-function handleButtonClick(event) {
+function handlePetalClick(event) {
 
     if (
         !acceptingInput
@@ -129,10 +113,12 @@ function handleButtonClick(event) {
 
     const value =
         Number(
-            event.currentTarget.dataset.id
+            event.target.dataset.id
         );
 
-    flashButton(value);
+    flashPetal(
+        value
+    );
 
     playerSequence.push(
         value
@@ -143,18 +129,22 @@ function handleButtonClick(event) {
 
 function checkInput() {
 
-    const currentIndex =
+    const index =
         playerSequence.length - 1;
 
     if (
 
-        playerSequence[currentIndex]
+        playerSequence[index]
         !==
-        sequence[currentIndex]
+        sequence[index]
 
     ) {
 
-        gameOver();
+        centerDisplay.textContent =
+            "Game Over";
+
+        acceptingInput = false;
+
         return;
     }
 
@@ -166,68 +156,19 @@ function checkInput() {
 
     ) {
 
-        roundComplete();
-    }
-}
+        acceptingInput = false;
 
-async function roundComplete() {
+        setTimeout(
+            () => {
 
-    acceptingInput = false;
+                addStep();
 
-    score =
-        sequence.length;
+                playSequence();
 
-    updateScore();
-
-    centerDisplay.textContent =
-        `Round ${score}`;
-
-    await sleep(1000);
-
-    addStep();
-
-    playSequence();
-}
-
-function gameOver() {
-
-    acceptingInput = false;
-
-    centerDisplay.textContent =
-        `Game Over`;
-
-    const best =
-        Number(
-            localStorage.getItem(
-                "bestScore"
-            ) || 0
+            },
+            500
         );
-
-    if (
-        score > best
-    ) {
-
-        localStorage.setItem(
-            "bestScore",
-            score
-        );
-
-        updateBestScore();
     }
-}
-
-function updateScore() {
-
-    scoreElement.textContent =
-        score;
-}
-
-function updateBestScore() {
-
-    bestScoreElement.textContent =
-        localStorage.getItem(
-            "bestScore"
-        ) || 0;
 }
 
 function sleep(ms) {
