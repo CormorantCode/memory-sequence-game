@@ -37,26 +37,30 @@ h1 {
     font-weight: bold;
 }
 
-/* ---------- BOARD ---------- */
+/* ---------------- */
+/* BOARD            */
+/* ---------------- */
 
 .board {
 
     position: relative;
 
-    width: 600px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
 
     margin: auto;
 }
 
-/* ---------- BUTTONS ---------- */
+/* ---------------- */
+/* BUTTONS          */
+/* ---------------- */
 
 .game-button {
 
     position: absolute;
 
-    width: 180px;
-    height: 180px;
+    width: 280px;
+    height: 280px;
 
     border-radius: 50%;
 
@@ -70,68 +74,77 @@ h1 {
         box-shadow 0.15s;
 }
 
-/* Positions */
+/* Colors */
 
-.top {
+.top-left {
 
-    top: 0;
-    left: 210px;
+    background: #21698b;
 
-    background: #2b6f8d;
+    left: 60px;
+    top: 60px;
 }
 
-.left {
+.top-right {
 
-    left: 0;
-    top: 210px;
+    background: #9fb616;
 
-    background: #f2c100;
+    right: 60px;
+    top: 60px;
 }
 
-.right {
+.bottom-left {
 
-    right: 0;
-    top: 210px;
+    background: #f4c100;
 
-    background: #9bb51a;
+    left: 60px;
+    bottom: 60px;
 }
 
-.bottom {
+.bottom-right {
 
-    left: 210px;
-    bottom: 0;
+    background: #d80000;
 
-    background: #d62828;
+    right: 60px;
+    bottom: 60px;
 }
 
-/* Lit State */
+/* Active State */
 
 .game-button.active {
 
     transform: scale(1.08);
 
-    filter: brightness(1.5);
+    filter:
+        brightness(1.5)
+        saturate(1.3);
 
     box-shadow:
-        0 0 35px rgba(255,255,255,0.9),
-        0 0 60px currentColor;
+        0 0 25px rgba(255,255,255,0.8),
+        0 0 60px rgba(255,255,255,0.4);
 }
 
-/* ---------- CENTER ---------- */
+/* ---------------- */
+/* CENTER CIRCLE    */
+/* ---------------- */
 
 #center-display {
 
     position: absolute;
 
-    width: 220px;
-    height: 220px;
+    width: 260px;
+    height: 260px;
 
-    left: 190px;
-    top: 190px;
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
 
     border-radius: 50%;
 
     background: #ececec;
+
+    z-index: 10;
 
     display: flex;
 
@@ -146,39 +159,49 @@ h1 {
     color: #333;
 
     box-shadow:
-        0 4px 12px rgba(0,0,0,0.15);
+        0 4px 15px rgba(0,0,0,0.15);
 }
 
-/* ---------- MOBILE ---------- */
+/* ---------------- */
+/* MOBILE           */
+/* ---------------- */
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
 
     .board {
 
-        width: 340px;
-        height: 340px;
+        width: 350px;
+        height: 350px;
     }
 
     .game-button {
 
-        width: 100px;
-        height: 100px;
+        width: 140px;
+        height: 140px;
     }
 
-    .top {
-        left: 120px;
+    .top-left {
+
+        left: 20px;
+        top: 20px;
     }
 
-    .left {
-        top: 120px;
+    .top-right {
+
+        right: 20px;
+        top: 20px;
     }
 
-    .right {
-        top: 120px;
+    .bottom-left {
+
+        left: 20px;
+        bottom: 20px;
     }
 
-    .bottom {
-        left: 120px;
+    .bottom-right {
+
+        right: 20px;
+        bottom: 20px;
     }
 
     #center-display {
@@ -186,9 +209,6 @@ h1 {
         width: 130px;
         height: 130px;
 
-        left: 105px;
-        top: 105px;
-
-        font-size: 24px;
+        font-size: 22px;
     }
 }
