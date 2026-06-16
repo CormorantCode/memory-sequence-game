@@ -1,154 +1,278 @@
-body {
+/* =======================================
+   HEADER PLACEHOLDER
+======================================= */
 
-    margin: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    min-height: 100vh;
-
-    background: #ececec;
-
-    font-family: Arial, sans-serif;
+#header-placeholder {
+    width: 100%;
+    max-width: 800px;
+    height: 48px;
+    background: #d0d0d0;
+    border-radius: 6px;
+    margin-bottom: 16px;
 }
+
+/* =======================================
+   GLOBAL
+======================================= */
+
+:root {
+    /* 280px at minimum width, grows up to 500px */
+    --board-size: min(calc(100vw - 8px), 500px);
+    --button-size: calc(var(--board-size) * 0.32);
+    --center-size: calc(var(--button-size) * 1.1);
+    /* Orbital radius: buttons nearly touch at 72° spacing */
+    --orbit-r: calc(var(--board-size) * 0.272);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 512px;
+    background: #ececec;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px 0;
+}
+
+/* =======================================
+   GAME CONTAINER
+======================================= */
 
 .game-container {
-
-    width: 700px;
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-#flower-board {
+/* =======================================
+   SCORES
+======================================= */
 
+.score-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+/* =======================================
+   GAME BOARD
+======================================= */
+
+#game-board {
     position: relative;
-
-    width: 650px;
-    height: 650px;
-
-    margin: 0 auto;
+    width: var(--board-size);
+    height: var(--board-size);
+    flex-shrink: 0;
 }
 
-/* ------------------ */
-/* Petals */
-/* ------------------ */
+/* =======================================
+   BUTTONS
+======================================= */
 
-.petal {
-
+.button {
     position: absolute;
-
-    width: 240px;
-    height: 240px;
-
+    width: var(--button-size);
+    height: var(--button-size);
     border: none;
-
     border-radius: 50%;
-
     cursor: pointer;
-
-    transition:
-        transform 0.15s ease,
-        filter 0.15s ease,
-        box-shadow 0.15s ease;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* Top */
+/*
+  All buttons centered on the board, then offset by --orbit-r along their
+  respective angle. Angles start from top (−90°), stepping 72° clockwise.
 
-.petal-1 {
+  sin/cos values per button:
+    btn-1:   0° from top → sin=0,     cos=−1
+    btn-2:  72° from top → sin=0.951, cos=−0.309
+    btn-3: 144° from top → sin=0.588, cos=0.809
+    btn-4: 216° from top → sin=−0.588, cos=0.809
+    btn-5: 288° from top → sin=−0.951, cos=−0.309
 
+  top  = 50% + orbit-r * cos(angle) − button-size/2
+  left = 50% + orbit-r * sin(angle) − button-size/2
+*/
+
+.button-1 {
     background: #0f5f84;
-
-    top: 10px;
-    left: 205px;
+    top:  calc(50% + var(--orbit-r) * -1     - var(--button-size) / 2);
+    left: calc(50% + var(--orbit-r) *  0     - var(--button-size) / 2);
 }
 
-/* Left */
-
-.petal-2 {
-
+.button-2 {
     background: #f86a23;
-
-    top: 140px;
-    left: 0;
+    top:  calc(50% + var(--orbit-r) * -0.309 - var(--button-size) / 2);
+    left: calc(50% + var(--orbit-r) *  0.951 - var(--button-size) / 2);
 }
 
-/* Right */
-
-.petal-3 {
-
+.button-3 {
     background: #f6bc00;
-
-    top: 140px;
-    right: 0;
+    top:  calc(50% + var(--orbit-r) *  0.809 - var(--button-size) / 2);
+    left: calc(50% + var(--orbit-r) *  0.588 - var(--button-size) / 2);
 }
 
-/* Bottom Left */
-
-.petal-4 {
-
+.button-4 {
     background: #7c9900;
-
-    top: 370px;
-    left: 90px;
+    top:  calc(50% + var(--orbit-r) *  0.809 - var(--button-size) / 2);
+    left: calc(50% + var(--orbit-r) * -0.588 - var(--button-size) / 2);
 }
 
-/* Bottom Right */
-
-.petal-5 {
-
+.button-5 {
     background: #d90000;
-
-    top: 370px;
-    right: 90px;
+    top:  calc(50% + var(--orbit-r) * -0.309 - var(--button-size) / 2);
+    left: calc(50% + var(--orbit-r) * -0.951 - var(--button-size) / 2);
 }
 
-/* ------------------ */
-/* Center Circle */
-/* ------------------ */
+/* =======================================
+   CENTER CIRCLE
+======================================= */
 
 #center-circle {
-
     position: absolute;
-
-    width: 260px;
-    height: 260px;
-
-    background: #eeeeee;
-
+    width: var(--center-size);
+    height: var(--center-size);
     border-radius: 50%;
-
-    top: 180px;
-    left: 195px;
-
+    background: #f3f3f3;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 10;
-
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 #center-display {
-
-    font-size: 32px;
+    font-size: 18px;
     font-weight: bold;
-
-    text-align: center;
-
     color: #444;
+    padding: 10px;
+    line-height: 1.3;
 }
 
-/* ------------------ */
-/* Lit State */
-/* ------------------ */
+/* =======================================
+   ACTIVE BUTTON
+======================================= */
 
-.petal.active {
+.button.active {
+    filter: brightness(1.5) saturate(1.4);
+    box-shadow: 0 0 18px white, 0 0 35px white;
+    z-index: 5;
+}
 
-    transform: scale(1.08);
+/* =======================================
+   SHAKE
+======================================= */
 
-    filter:
-        brightness(1.5)
-        saturate(1.4);
+@keyframes shake {
+    0%   { transform: translateX(0); }
+    10%  { transform: translateX(-8px); }
+    20%  { transform: translateX(8px); }
+    30%  { transform: translateX(-8px); }
+    40%  { transform: translateX(8px); }
+    50%  { transform: translateX(-8px); }
+    60%  { transform: translateX(8px); }
+    70%  { transform: translateX(-8px); }
+    80%  { transform: translateX(8px); }
+    90%  { transform: translateX(-8px); }
+    100% { transform: translateX(0); }
+}
 
+.button.shake {
+    animation: shake 0.4s infinite;
+}
+
+/* =======================================
+   STEP COUNTER
+======================================= */
+
+#step-counter {
+    font-size: 13px;
+    font-weight: bold;
+    color: #666;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    min-height: 16px;
+}
+
+/* =======================================
+   PROGRESS TRACKER
+======================================= */
+
+#progress-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 18px;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+/* Convex dome — 3D pop-out effect via radial gradients:
+   - outer dark ring for depth/shadow around the edge
+   - mid color of the bulb
+   - small bright specular highlight offset upper-left */
+.progress-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
+        radial-gradient(circle at 50% 50%, #9a9a9a 40%, #555 100%);
     box-shadow:
-        0 0 20px white,
-        0 0 50px white;
+        0 2px 4px rgba(0,0,0,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.3);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.progress-dot.correct {
+    background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
+        radial-gradient(circle at 50% 50%, #4ddd4d 35%, #1a7a1a 100%);
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.2),
+        0 0 7px 2px rgba(60,220,60,0.7),
+        0 0 16px 4px rgba(40,180,40,0.35);
+}
+
+.progress-dot.wrong {
+    background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
+        radial-gradient(circle at 50% 50%, #f05a4a 35%, #8b1a1a 100%);
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.4),
+        inset 0 -2px 4px rgba(0,0,0,0.2),
+        0 0 7px 2px rgba(220,60,60,0.7),
+        0 0 16px 4px rgba(180,40,40,0.35);
+}
+
+.progress-divider {
+    width: 2px;
+    height: 16px;
+    background: #888;
+    border-radius: 1px;
+    margin: 0 3px;
+}
+
+
+
+@media (max-width: 320px) {
+    #center-display { font-size: 16px; }
+    .score-row      { font-size: 16px; }
 }
