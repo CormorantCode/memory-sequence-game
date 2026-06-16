@@ -87,8 +87,16 @@ body {
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+    box-shadow:
+        0 5px 8px rgba(0,0,0,0.4),
+        0 2px 3px rgba(0,0,0,0.25),
+        inset 0 -3px 0 rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    transition: box-shadow 0.08s ease, transform 0.08s ease;
 }
+
+
+
 
 /*
   All buttons centered on the board, then offset by --orbit-r along their
@@ -144,7 +152,7 @@ body {
     width: var(--center-size);
     height: var(--center-size);
     border-radius: 50%;
-    background: #f3f3f3;
+    background: radial-gradient(circle at 38% 32%, #ffffff 0%, #e8e8e8 100%);
     box-shadow: 0 3px 10px rgba(0,0,0,0.12);
     top: 50%;
     left: 50%;
@@ -169,8 +177,11 @@ body {
 ======================================= */
 
 .button.active {
-    filter: brightness(1.5) saturate(1.4);
-    box-shadow: 0 0 18px white, 0 0 35px white;
+    filter: brightness(1.4) saturate(1.3);
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.4),
+        inset 0 2px 5px rgba(0,0,0,0.3);
+    transform: translateY(2px);
     z-index: 5;
 }
 
@@ -200,14 +211,40 @@ body {
    STEP COUNTER
 ======================================= */
 
+@keyframes amberPulse {
+    0%, 100% { color: #999; }
+    50%       { color: #c89000; }
+}
+
 #step-counter {
-    font-size: 13px;
-    font-weight: bold;
-    color: #666;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    display: grid;
+    grid-template-columns: 68px 90px 136px 76px;
+    width: 370px;
     margin-bottom: 8px;
-    min-height: 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sc-cell {
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+}
+
+.sc-label {
+    font-weight: bold;
+    color: #444;
+}
+
+.sc-value {
+    font-weight: normal;
+    color: #666;
+}
+
+.sc-cell.best-active .sc-label,
+.sc-cell.best-active .sc-value {
+    animation: amberPulse 2.5s ease-in-out infinite;
 }
 
 /* =======================================
@@ -240,8 +277,7 @@ body {
     transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.progress-dot.correct {
-    background:
+.progress-dot.correct { background:
         radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
         radial-gradient(circle at 50% 50%, #4ddd4d 35%, #1a7a1a 100%);
     box-shadow:
@@ -251,8 +287,7 @@ body {
         0 0 16px 4px rgba(40,180,40,0.35);
 }
 
-.progress-dot.wrong {
-    background:
+.progress-dot.wrong { background:
         radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
         radial-gradient(circle at 50% 50%, #f05a4a 35%, #8b1a1a 100%);
     box-shadow:
@@ -260,6 +295,67 @@ body {
         inset 0 -2px 4px rgba(0,0,0,0.2),
         0 0 7px 2px rgba(220,60,60,0.7),
         0 0 16px 4px rgba(180,40,40,0.35);
+}
+
+/* Amber pulse — bulb and glow breathe together */
+@keyframes amberBulbPulse {
+    0%, 100% {
+        background:
+            radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
+            radial-gradient(circle at 50% 50%, #9a9a9a 40%, #555 100%);
+        box-shadow:
+            0 2px 4px rgba(0,0,0,0.4),
+            inset 0 -2px 4px rgba(0,0,0,0.3),
+            0 0 0 2.5px rgba(245,196,0,0.2),
+            0 0 4px 1px rgba(245,196,0,0.1);
+    }
+    50% {
+        background:
+            radial-gradient(circle at 35% 35%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%),
+            radial-gradient(circle at 50% 50%, #ffe066 30%, #c87800 100%);
+        box-shadow:
+            0 2px 4px rgba(0,0,0,0.4),
+            inset 0 -2px 4px rgba(0,0,0,0.2),
+            0 0 0 2.5px #f5c400,
+            0 0 12px 5px rgba(245,196,0,0.85);
+    }
+}
+
+@keyframes amberBulbPulseRed {
+    0%, 100% {
+        background:
+            radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
+            radial-gradient(circle at 50% 50%, #f05a4a 35%, #8b1a1a 100%);
+        box-shadow:
+            0 2px 4px rgba(0,0,0,0.4),
+            inset 0 -2px 4px rgba(0,0,0,0.2),
+            0 0 7px 2px rgba(220,60,60,0.7),
+            0 0 0 2.5px rgba(245,196,0,0.2),
+            0 0 4px 1px rgba(245,196,0,0.1);
+    }
+    50% {
+        background:
+            radial-gradient(circle at 35% 35%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 45%),
+            radial-gradient(circle at 50% 50%, #ffe066 30%, #c87800 100%);
+        box-shadow:
+            0 2px 4px rgba(0,0,0,0.4),
+            inset 0 -2px 4px rgba(0,0,0,0.2),
+            0 0 7px 2px rgba(220,60,60,0.4),
+            0 0 0 2.5px #f5c400,
+            0 0 12px 5px rgba(245,196,0,0.85);
+    }
+}
+
+.progress-dot.best {
+    animation: amberBulbPulse 2.5s ease-in-out infinite;
+}
+
+.progress-dot.wrong.best {
+    animation: amberBulbPulseRed 2.5s ease-in-out infinite;
+}
+
+.progress-dot.correct.best {
+    animation: amberBulbPulse 2.5s ease-in-out infinite;
 }
 
 .progress-divider {

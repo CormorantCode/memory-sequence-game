@@ -6,7 +6,8 @@ const WRONG_SHAKE_MS = 1200;
 const REVEAL_FLASHES = 3;
 const REVEAL_FLASH_MS = 350;
 
-const FLASH_MS = 400;
+const FLASH_MS = 400;  // sequence playback — slow enough to read
+const TAP_MS = 100;    // user press — snappy, keeps up with fast clicks
 
 const buttons =
     document.querySelectorAll(".button");
@@ -15,11 +16,12 @@ const centerDisplay =
     document.getElementById("center-display");
 
 const progressTracker = document.getElementById("progress-tracker");
-const stepCounter = document.getElementById("step-counter");
 
 let sequence = [];
 let playerSequence = [];
 let acceptingInput = false;
+let playCount = 0;      // increments each time the user starts a new play
+let bestStep = 0;       // max step reached in the current play (1-based)
 
 // Button color names for "correct color was X" message
 const BUTTON_NAMES = [
@@ -36,9 +38,15 @@ buttons.forEach(button => {
     button.addEventListener("click", handlebuttonClick);
 });
 
+// Render initial dash state before any game starts
+buildProgressTracker();
+updateStepCounter();
+
 function startGame() {
 
     sequence = [];
+    bestStep = 0;
+    playCount++;
 
     buildProgressTracker();
 
@@ -87,6 +95,21 @@ function updateProgressDot(index, state) {
     }
 }
 
+function markBestDot() {
+
+    // Remove any existing best marker
+    progressTracker.querySelectorAll('.progress-dot.best').forEach(d => {
+        d.classList.remove('best');
+    });
+
+    if (bestStep > 0) {
+        const dot = progressTracker.querySelector(
+            `.progress-dot[data-step="${bestStep - 1}"]`
+        );
+        if (dot) dot.classList.add('best');
+    }
+}
+
 function getRoundNumber() {
     // Round 1 = 3 steps, Round 2 = 4 steps, etc. → round = length - 2
     return sequence.length - (STARTING_LENGTH - 1);
@@ -98,18 +121,42 @@ function getRoundLabel() {
     return round === totalRounds ? "FINAL ROUND" : `ROUND ${round}`;
 }
 
-function updateStepCounter(state) {
+function updateStepCounter(state, showBest = false) {
 
-    if (!stepCounter) return;
+    const scPlayVal  = document.getElementById("sc-play-val");
+    const scRoundVal = document.getElementById("sc-round-val");
+    const scStepVal  = document.getElementById("sc-step-val");
+    const scBestVal  = document.getElementById("sc-best-val");
+    const scBestCell = document.getElementById("sc-best");
 
-    const label = getRoundLabel();
+    if (!scPlayVal) return;
 
-    if (state === "watch") {
-        stepCounter.textContent = `${label}: WATCH...`;
+    // PLAY column
+    scPlayVal.textContent = playCount > 0 ? playCount : "—";
+
+    // ROUND column — show number, cap at total rounds for FINAL ROUND
+    const totalRounds = MAX_SEQUENCE_LENGTH - (STARTING_LENGTH - 1);
+    const roundNum = sequence.length > 0 ? getRoundNumber() : "—";
+    scRoundVal.textContent = roundNum === totalRounds ? `${roundNum} ★` : roundNum;
+
+    // STEP column — no WATCH text, just show "— of N" while sequence plays
+    if (sequence.length === 0) {
+        scStepVal.textContent = "— of —";
+    } else if (state === "watch") {
+        scStepVal.textContent = `— of ${sequence.length}`;
     } else if (state === undefined) {
-        stepCounter.textContent = `${label}: STEP 1 of ${sequence.length}`;
+        scStepVal.textContent = `1 of ${sequence.length}`;
     } else {
-        stepCounter.textContent = `${label}: STEP ${state + 1} of ${sequence.length}`;
+        scStepVal.textContent = `${state + 1} of ${sequence.length}`;
+    }
+
+    // BEST column — amber pulse only when shown at game end
+    if (showBest && bestStep > 0) {
+        scBestVal.textContent = bestStep;
+        scBestCell.classList.add("best-active");
+    } else {
+        scBestVal.textContent = bestStep > 0 ? bestStep : "—";
+        scBestCell.classList.remove("best-active");
     }
 }
 
@@ -143,10 +190,14 @@ async function playSequence() {
 }
 
 async function flashbutton(index) {
-
     buttons[index].classList.add("active");
     await sleep(FLASH_MS);
     buttons[index].classList.remove("active");
+}
+
+function tapButton(index) {
+    buttons[index].classList.add("active");
+    setTimeout(() => buttons[index].classList.remove("active"), TAP_MS);
 }
 
 function handlebuttonClick(event) {
@@ -155,7 +206,7 @@ function handlebuttonClick(event) {
 
     const value = Number(event.target.dataset.id);
 
-    flashbutton(value);
+    tapButton(value);
 
     playerSequence.push(value);
 
@@ -187,8 +238,7 @@ async function checkInput() {
         // Show which color was correct, flash it
         const correctName = BUTTON_NAMES[expected];
 
-        centerDisplay.textContent =
-            `The correct color was ${correctName}`;
+        centerDisplay.textContent = `The correct color was ${correctName}`;
 
         for (let i = 0; i < REVEAL_FLASHES; i++) {
 
@@ -200,15 +250,21 @@ async function checkInput() {
 
         await sleep(600);
 
-        centerDisplay.innerHTML =
-            `Game over at step ${sequence.length}!<br><small>Tap to try again</small>`;
+        // Show gold ring on best step dot, update header with BEST
+        markBestDot();
+        updateStepCounter(index, true);
+
+        centerDisplay.innerHTML = `Game over!<br><small>Tap to replay</small>`;
 
         centerDisplay.addEventListener("click", startGame, { once: true });
 
         return;
     }
 
-    // Correct step – light up the dot
+    // Correct step — update best and light up the dot
+    const stepReached = index + 1;  // 1-based
+    if (stepReached > bestStep) bestStep = stepReached;
+
     updateProgressDot(index, "correct");
 
     if (playerSequence.length === sequence.length) {
