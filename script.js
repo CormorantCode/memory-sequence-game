@@ -26,10 +26,10 @@ let bestStep = 0;       // max step reached in the current play (1-based)
 // Button color names for "correct color was X" message
 const BUTTON_NAMES = [
     "blue",
-    "orange",
     "yellow",
+    "red",
     "green",
-    "red"
+    "orange"
 ];
 
 const headerBtn     = document.getElementById("header-btn");
