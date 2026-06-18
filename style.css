@@ -1,15 +1,108 @@
 /* =======================================
-   HEADER PLACEHOLDER
+   HEADER
 ======================================= */
 
-#header-placeholder {
-    width: 100%;
-    max-width: 800px;
-    height: 48px;
-    background: #d0d0d0;
-    border-radius: 6px;
-    margin-bottom: 16px;
+#game-header {
+    width: min(calc(100vw - 8px), 500px);
+    min-height: 64px;
+    background: #383838;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
+
+.header-play-btn {
+    background: #074D69;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 7px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.04em;
+    transition: background 0.15s ease;
+}
+
+.header-play-btn:hover { background: #063d54; }
+.header-play-btn:active { background: #052e3e; }
+
+#header-center {
+    flex: 1;
+    min-width: 0;
+}
+
+#header-instructions {
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.45;
+}
+
+#header-replay {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.replay-label {
+    font-size: 10px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1px;
+}
+
+.replay-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #ddd;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.replay-option input[type="radio"] {
+    accent-color: #074D69;
+    cursor: pointer;
+    margin: 0;
+    width: 12px;
+    height: 12px;
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.icon-btn {
+    background: none;
+    border: 1px solid #555;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.icon-btn:hover { border-color: #aaa; color: #fff; }
+.icon-btn svg { display: block; }
+
+.hidden { display: none !important; }
 
 /* =======================================
    GLOBAL
@@ -20,7 +113,9 @@
     --board-size: min(calc(100vw - 8px), 500px);
     --button-size: calc(var(--board-size) * 0.32);
     --center-size: calc(var(--button-size) * 1.1);
-    /* Orbital radius: buttons nearly touch at 72° spacing */
+    /* Progress dot sizing — scales with board so 20 dots always fit */
+    --dot-size: calc(var(--board-size) / 28);
+    --dot-gap:  calc(var(--board-size) / 130);
     --orbit-r: calc(var(--board-size) * 0.272);
 }
 
@@ -31,12 +126,12 @@
 body {
     margin: 0;
     min-height: 512px;
-    background: #ececec;
+    background: #2a2a2a;
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 4px 0;
+    padding: 0 4px 0;
 }
 
 /* =======================================
@@ -88,11 +183,11 @@ body {
     border-radius: 50%;
     cursor: pointer;
     box-shadow:
-        0 5px 8px rgba(0,0,0,0.4),
-        0 2px 3px rgba(0,0,0,0.25),
-        inset 0 -3px 0 rgba(0,0,0,0.25),
-        inset 0 1px 0 rgba(255,255,255,0.15);
-    transition: box-shadow 0.08s ease, transform 0.08s ease;
+        0 6px 12px rgba(0,0,0,0.55),
+        0 2px 4px rgba(0,0,0,0.35),
+        inset 0 -3px 0 rgba(0,0,0,0.4),
+        inset 0 2px 0 rgba(255,255,255,0.22);
+    transition: box-shadow 0.08s ease, transform 0.08s ease, filter 0.08s ease;
 }
 
 
@@ -114,31 +209,36 @@ body {
 */
 
 .button-1 {
-    background: #0f5f84;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(80,190,245,1.0) 0%, rgba(15,75,110,0.92) 55%, rgba(5,30,50,0.96) 100%);
     top:  calc(50% + var(--orbit-r) * -1     - var(--button-size) / 2);
     left: calc(50% + var(--orbit-r) *  0     - var(--button-size) / 2);
 }
 
 .button-2 {
-    background: #f86a23;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255,175,80,1.0) 0%, rgba(180,65,10,0.92) 55%, rgba(80,20,0,0.96) 100%);
     top:  calc(50% + var(--orbit-r) * -0.309 - var(--button-size) / 2);
     left: calc(50% + var(--orbit-r) *  0.951 - var(--button-size) / 2);
 }
 
 .button-3 {
-    background: #f6bc00;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255,235,90,1.0) 0%, rgba(190,130,10,0.92) 55%, rgba(80,55,0,0.96) 100%);
     top:  calc(50% + var(--orbit-r) *  0.809 - var(--button-size) / 2);
     left: calc(50% + var(--orbit-r) *  0.588 - var(--button-size) / 2);
 }
 
 .button-4 {
-    background: #7c9900;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(185,235,40,1.0) 0%, rgba(90,130,5,0.92) 55%, rgba(28,48,0,0.96) 100%);
     top:  calc(50% + var(--orbit-r) *  0.809 - var(--button-size) / 2);
     left: calc(50% + var(--orbit-r) * -0.588 - var(--button-size) / 2);
 }
 
 .button-5 {
-    background: #d90000;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255,100,80,1.0) 0%, rgba(185,20,10,0.92) 55%, rgba(75,0,0,0.96) 100%);
     top:  calc(50% + var(--orbit-r) * -0.309 - var(--button-size) / 2);
     left: calc(50% + var(--orbit-r) * -0.951 - var(--button-size) / 2);
 }
@@ -152,8 +252,8 @@ body {
     width: var(--center-size);
     height: var(--center-size);
     border-radius: 50%;
-    background: radial-gradient(circle at 38% 32%, #ffffff 0%, #e8e8e8 100%);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    background: radial-gradient(circle at 45% 40%, #f0ebe3 0%, #d9d0c4 100%);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -167,7 +267,7 @@ body {
 #center-display {
     font-size: 18px;
     font-weight: bold;
-    color: #444;
+    color: #4a3f32;
     padding: 10px;
     line-height: 1.3;
 }
@@ -177,10 +277,11 @@ body {
 ======================================= */
 
 .button.active {
-    filter: brightness(1.4) saturate(1.3);
+    filter: brightness(2.0) saturate(1.3);
     box-shadow:
-        0 1px 2px rgba(0,0,0,0.4),
-        inset 0 2px 5px rgba(0,0,0,0.3);
+        0 0 14px rgba(255,255,255,0.7),
+        0 0 30px rgba(255,255,255,0.25),
+        inset 0 2px 5px rgba(0,0,0,0.2);
     transform: translateY(2px);
     z-index: 5;
 }
@@ -216,30 +317,43 @@ body {
     50%       { color: #c89000; }
 }
 
+/* =======================================
+   TRACKER WRAP
+======================================= */
+
+#tracker-wrap {
+    width: var(--board-size);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+
 #step-counter {
     display: grid;
-    grid-template-columns: 68px 90px 136px 76px;
-    width: 370px;
-    margin-bottom: 8px;
+    grid-template-columns: 25% 25% 34% 15%;
+    width: 75%;
+    margin: 0 auto 6px;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
 
-.sc-cell {
-    display: flex;
-    gap: 4px;
-    align-items: baseline;
-}
+.sc-cell { display: flex; gap: 4px; align-items: baseline; }
+.sc-cell:first-child { padding-left: 0; }
+
+.sc-cell { display: flex; gap: 4px; align-items: baseline; }
+.sc-cell:first-child { padding-left: 0; }
 
 .sc-label {
     font-weight: bold;
-    color: #444;
+    color: #aaa;
 }
 
 .sc-value {
     font-weight: normal;
-    color: #666;
+    color: #ddd;
 }
 
 .sc-cell.best-active .sc-label,
@@ -255,9 +369,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 18px;
-    gap: 6px;
+    width: 100%;
+    margin-top: 10px;
+    gap: var(--dot-gap);
     flex-wrap: nowrap;
+    box-sizing: border-box;
 }
 
 /* Convex dome — 3D pop-out effect via radial gradients:
@@ -265,8 +381,9 @@ body {
    - mid color of the bulb
    - small bright specular highlight offset upper-left */
 .progress-dot {
-    width: 16px;
-    height: 16px;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    flex-shrink: 0;
     border-radius: 50%;
     background:
         radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%),
@@ -359,11 +476,12 @@ body {
 }
 
 .progress-divider {
-    width: 2px;
-    height: 16px;
-    background: #888;
+    width: 1.5px;
+    height: var(--dot-size);
+    background: #555;
     border-radius: 1px;
-    margin: 0 3px;
+    flex-shrink: 0;
+    margin: 0 calc(var(--dot-gap) * 0.5);
 }
 
 

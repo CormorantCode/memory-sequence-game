@@ -32,7 +32,12 @@ const BUTTON_NAMES = [
     "red"
 ];
 
-centerDisplay.addEventListener("click", startGame);
+const headerBtn     = document.getElementById("header-btn");
+const headerInstr   = document.getElementById("header-instructions");
+const headerReplay  = document.getElementById("header-replay");
+const replayLast    = document.getElementById("replay-last-label");
+
+headerBtn.addEventListener("click", handleHeaderBtn);
 
 buttons.forEach(button => {
     button.addEventListener("click", handlebuttonClick);
@@ -42,7 +47,14 @@ buttons.forEach(button => {
 buildProgressTracker();
 updateStepCounter();
 
-function startGame() {
+function handleHeaderBtn() {
+    const fromLast = document.querySelector('input[name="replay-from"]:checked').value === "last";
+    startGame(fromLast && playCount > 0 ? lastFailedRound : 0);
+}
+
+let lastFailedRound = 0;  // sequence length at the round where player failed
+
+function startGame(startFromLength = 0) {
 
     sequence = [];
     bestStep = 0;
@@ -50,16 +62,29 @@ function startGame() {
 
     buildProgressTracker();
 
-    // Start with STARTING_LENGTH steps
-    for (let i = 0; i < STARTING_LENGTH; i++) {
-        addStep();
-    }
+    // Determine starting sequence length
+    const startLength = (startFromLength >= STARTING_LENGTH) ? startFromLength : STARTING_LENGTH;
+    for (let i = 0; i < startLength; i++) addStep();
+
+    // Switch header to replay state after first play
+    switchHeaderToReplay();
 
     playSequence();
 }
 
-function addStep() {
+function switchHeaderToReplay() {
+    headerBtn.textContent = "Replay";
+    headerInstr.classList.add("hidden");
+    headerReplay.classList.remove("hidden");
+}
 
+function updateReplayLastLabel() {
+    const round = getRoundNumber();
+    const steps = sequence.length;
+    replayLast.textContent = `Round ${round} · ${steps} steps`;
+}
+
+function addStep() {
     sequence.push(Math.floor(Math.random() * 5));
 }
 
@@ -254,9 +279,11 @@ async function checkInput() {
         markBestDot();
         updateStepCounter(index, true);
 
-        centerDisplay.innerHTML = `Game over!<br><small>Tap to replay</small>`;
+        // Record the round for "replay from last" option
+        lastFailedRound = sequence.length;
+        updateReplayLastLabel();
 
-        centerDisplay.addEventListener("click", startGame, { once: true });
+        centerDisplay.innerHTML = `Game over!<br><small>Use Replay above</small>`;
 
         return;
     }
@@ -379,11 +406,12 @@ function launchConfetti() {
 
     setTimeout(() => container.remove(), 3000);
 
-    // Tap to play again
+    // Update center and replay label
     setTimeout(() => {
         centerDisplay.innerHTML =
-            "<span style='font-size:1.4em;'>YOU WON!</span><br><small>Tap to play again</small>";
-        centerDisplay.addEventListener("click", startGame, { once: true });
+            "<span style='font-size:1.4em;'>YOU WON!</span><br><small>Use Replay above</small>";
+        lastFailedRound = MAX_SEQUENCE_LENGTH;
+        updateReplayLastLabel();
     }, 1500);
 }
 
