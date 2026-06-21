@@ -1,3 +1,13 @@
+const USE_FIXED_SEQUENCE = true;
+
+const FIXED_SEQUENCE = [
+    0,2,4,1,3,
+    0,4,2,1,0,
+    3,1,4,2,0,
+    4,1,3,0,2,
+    1,4,0,3,2
+];
+
 const MAX_SEQUENCE_LENGTH = 20;
 const STARTING_LENGTH = 3;
 
@@ -32,24 +42,41 @@ const BUTTON_NAMES = [
     "orange"
 ];
 
-const headerBtn     = document.getElementById("header-btn");
-const headerInstr   = document.getElementById("header-instructions");
-const headerReplay  = document.getElementById("header-replay");
-const replayLast    = document.getElementById("replay-last-label");
+const centerCircle    = document.getElementById("center-circle");
+const replayOptions   = document.getElementById("replay-options");
+const replayBeginning = document.getElementById("replay-beginning");
+const replayLast      = document.getElementById("replay-last");
 
-headerBtn.addEventListener("click", handleHeaderBtn);
+centerCircle.addEventListener("click", handleCenterClick);
+
+replayBeginning.addEventListener("click", () => setReplayOption("beginning"));
+replayLast.addEventListener("click",      () => setReplayOption("last"));
+
+function setReplayOption(choice) {
+    replayBeginning.classList.toggle("active", choice === "beginning");
+    replayLast.classList.toggle("active",      choice === "last");
+    replayOptions.classList.remove("pulsing");
+}
 
 buttons.forEach(button => {
     button.addEventListener("click", handlebuttonClick);
 });
 
+// Start with center circle pulsing, ready for first play
+setCenterPulse(true);
+
 // Render initial dash state before any game starts
 buildProgressTracker();
 updateStepCounter();
 
-function handleHeaderBtn() {
-    const fromLast = document.querySelector('input[name="replay-from"]:checked').value === "last";
+function handleCenterClick() {
+    if (!centerCircle.classList.contains("pulsing")) return;
+    const fromLast = replayLast.classList.contains("active");
     startGame(fromLast && playCount > 0 ? lastFailedRound : 0);
+}
+
+function setCenterPulse(on) {
+    centerCircle.classList.toggle("pulsing", on);
 }
 
 let lastFailedRound = 0;  // sequence length at the round where player failed
@@ -63,29 +90,61 @@ function startGame(startFromLength = 0) {
     buildProgressTracker();
 
     // Determine starting sequence length
-    const startLength = (startFromLength >= STARTING_LENGTH) ? startFromLength : STARTING_LENGTH;
-    for (let i = 0; i < startLength; i++) addStep();
+    const startLength =
+        (startFromLength >= STARTING_LENGTH)
+            ? startFromLength
+            : STARTING_LENGTH;
 
-    // Switch header to replay state after first play
-    switchHeaderToReplay();
+    if (USE_FIXED_SEQUENCE) {
+
+        sequence = FIXED_SEQUENCE.slice(0, startLength);
+
+    } else {
+
+        for (let i = 0; i < startLength; i++) {
+            addStep();
+        }
+    }
+
+    // Hide replay options and stop pulse when game starts
+    replayOptions.classList.add("hidden");
+    
+    replayOptions.classList.remove("pulsing");
+    setReplayOption("beginning");
+    setCenterPulse(false);
 
     playSequence();
 }
 
-function switchHeaderToReplay() {
-    headerBtn.textContent = "Replay";
-    headerInstr.classList.add("hidden");
-    headerReplay.classList.remove("hidden");
-}
-
 function updateReplayLastLabel() {
     const round = getRoundNumber();
-    const steps = sequence.length;
-    replayLast.textContent = `Round ${round} · ${steps} steps`;
+    replayLast.textContent = `From Round ${round}`;
 }
 
 function addStep() {
-    sequence.push(Math.floor(Math.random() * 5));
+    let candidate;
+    do {
+        candidate = Math.floor(Math.random() * 5);
+    } while (!isValidNextStep(candidate));
+    sequence.push(candidate);
+}
+
+function isValidNextStep(candidate) {
+    const test = [...sequence, candidate];
+    return (
+        !hasFourInARow(test) &&
+        !hasPatternRepeatedFourTimes(test)
+    );
+}
+
+function hasFourInARow(seq) {
+    if (seq.length < 4) return false;
+    const n = seq.length;
+    return (
+        seq[n - 1] === seq[n - 2] &&
+        seq[n - 2] === seq[n - 3] &&
+        seq[n - 3] === seq[n - 4]
+    );
 }
 
 function buildProgressTracker() {
@@ -190,7 +249,7 @@ async function playSequence() {
     acceptingInput = false;
 
     updateStepCounter("watch");
-    centerDisplay.textContent = "Watch";
+    centerDisplay.textContent = "WATCH";
 
     await sleep(600);
 
@@ -209,7 +268,7 @@ async function playSequence() {
 
     updateStepCounter();
 
-    centerDisplay.textContent = "Go";
+    centerDisplay.textContent = "GO";
 
     acceptingInput = true;
 }
@@ -263,7 +322,7 @@ async function checkInput() {
         // Show which color was correct, flash it
         const correctName = BUTTON_NAMES[expected];
 
-        centerDisplay.textContent = `The correct color was ${correctName}`;
+        centerDisplay.textContent = `The next color was ${correctName}`;
 
         for (let i = 0; i < REVEAL_FLASHES; i++) {
 
@@ -271,11 +330,12 @@ async function checkInput() {
             buttons[expected].classList.add("active");
             await sleep(REVEAL_FLASH_MS);
             buttons[expected].classList.remove("active");
+
         }
 
-        await sleep(600);
+        await sleep(800);
 
-        // Show gold ring on best step dot, update header with BEST
+        // Show gold ring on best step dot, update counter with BEST
         markBestDot();
         updateStepCounter(index, true);
 
@@ -283,7 +343,12 @@ async function checkInput() {
         lastFailedRound = sequence.length;
         updateReplayLastLabel();
 
-        centerDisplay.innerHTML = `Game over!<br><small>Use Replay above</small>`;
+        // Show replay options and return circle to pulsing state
+        replayOptions.classList.remove("hidden");
+        
+        replayOptions.classList.add("pulsing");
+        setCenterPulse(true);
+        setReplayDisplay(bestStep);
 
         return;
     }
@@ -307,7 +372,14 @@ async function checkInput() {
 
         // Next round
         setTimeout(() => {
-            addStep();
+            if (USE_FIXED_SEQUENCE) {
+                sequence = FIXED_SEQUENCE.slice(
+                    0,
+                    sequence.length + 1
+                );
+            } else {
+                addStep();
+            }
             playSequence();
         }, 600);
     }
@@ -316,11 +388,9 @@ async function checkInput() {
 async function triggerWin() {
 
     centerDisplay.innerHTML =
-        "<span style='font-size:1.4em;'>YOU WON!</span>";
+        "<span style='font-size:1.3em;'>YOU WON!</span>";
 
     // Flash entire board 3 times
-    const board = document.getElementById("game-board");
-
     for (let i = 0; i < 3; i++) {
 
         buttons.forEach(b => b.classList.add("active"));
@@ -406,12 +476,15 @@ function launchConfetti() {
 
     setTimeout(() => container.remove(), 3000);
 
-    // Update center and replay label
+    // Update center to replay/win state
     setTimeout(() => {
-        centerDisplay.innerHTML =
-            "<span style='font-size:1.4em;'>YOU WON!</span><br><small>Use Replay above</small>";
         lastFailedRound = MAX_SEQUENCE_LENGTH;
         updateReplayLastLabel();
+        replayOptions.classList.remove("hidden");
+        
+        replayOptions.classList.add("pulsing");
+        setCenterPulse(true);
+        setReplayDisplay(MAX_SEQUENCE_LENGTH);
     }, 1500);
 }
 
@@ -419,4 +492,13 @@ function launchConfetti() {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function setReplayDisplay(steps) {
+    centerDisplay.innerHTML =
+        `REPLAY` +
+        `<span style="display:block;margin-top:6px;line-height:1.4;font-size:0.66em;font-weight:normal;letter-spacing:0.02em;color:#c89000;">` +
+            `Personal Best<br>` +
+            `<strong>${steps} of ${MAX_SEQUENCE_LENGTH} Steps</strong>` +
+        `</span>`;
 }
