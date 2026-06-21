@@ -362,8 +362,8 @@ body {
 
 #step-counter {
     display: grid;
-    grid-template-columns: 25% 25% 34% 15%;
-    width: 75%;
+    grid-template-columns: 21% 24% 35% 15%;
+    width: 80%;
     margin: 0 auto 6px;
     font-size: 14px;
     text-transform: uppercase;

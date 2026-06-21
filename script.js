@@ -1,11 +1,11 @@
 const USE_FIXED_SEQUENCE = true;
 
 const FIXED_SEQUENCE = [
-    0,2,4,1,3,
-    0,4,2,1,0,
-    3,1,4,2,0,
-    4,1,3,0,2,
-    1,4,0,3,2
+    0,0,0,0,0,
+    1,1,1,1,1,
+    2,2,2,2,2,
+    3,3,3,3,3,
+    4,4,4,4,4
 ];
 
 const MAX_SEQUENCE_LENGTH = 20;
@@ -221,7 +221,7 @@ function updateStepCounter(state, showBest = false) {
     // ROUND column — show number, cap at total rounds for FINAL ROUND
     const totalRounds = MAX_SEQUENCE_LENGTH - (STARTING_LENGTH - 1);
     const roundNum = sequence.length > 0 ? getRoundNumber() : "—";
-    scRoundVal.textContent = roundNum === totalRounds ? `${roundNum} ★` : roundNum;
+    scRoundVal.textContent = roundNum;
 
     // STEP column — no WATCH text, just show "— of N" while sequence plays
     if (sequence.length === 0) {
