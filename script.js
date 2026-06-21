@@ -497,8 +497,8 @@ function sleep(ms) {
 function setReplayDisplay(steps) {
     centerDisplay.innerHTML =
         `REPLAY` +
-        `<span style="display:block;margin-top:6px;line-height:1.4;font-size:0.66em;font-weight:normal;letter-spacing:0.02em;color:#c89000;">` +
-            `Personal Best<br>` +
-            `<strong>${steps} of ${MAX_SEQUENCE_LENGTH} Steps</strong>` +
+        `<span style="display:block;margin-top:6px;">` +
+            `<span style="display:block;font-size:0.64em;font-weight:normal;letter-spacing:0.02em;color:#505050;">Personal Best</span>` +
+            `<span style="display:block;font-size:0.72em;font-weight:normal;letter-spacing:0.02em;color:#c89000;">${steps} of ${MAX_SEQUENCE_LENGTH} Steps</span>` +
         `</span>`;
 }

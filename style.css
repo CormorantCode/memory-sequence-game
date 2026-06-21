@@ -1,55 +1,4 @@
 /* =======================================
-   HEADER
-======================================= */
-
-#game-header {
-    width: min(calc(100vw - 8px), 500px);
-    min-height: 48px;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    box-sizing: border-box;
-    flex-shrink: 0;
-}
-
-#game-title {
-    margin: 0;
-    font-size: 24px;
-    font-weight: bold;
-    letter-spacing: 0.02em;
-}
-
-.header-icons {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-}
-
-.icon-btn {
-    background: none;
-    border: 1px solid #9ca3af;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    transition: border-color 0.15s ease, color 0.15s ease;
-    flex-shrink: 0;
-}
-
-.icon-btn:hover { border-color: var(--text-primary); color: var(--text-primary); }
-.icon-btn svg { display: block; }
-
-.hidden { display: none !important; }
-
-/* =======================================
    GLOBAL
 ======================================= */
 
@@ -79,7 +28,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 4px 0;
+    padding: 8px 4px 0;
 }
 
 /* =======================================
@@ -104,6 +53,36 @@ body {
     height: var(--board-size);
     flex-shrink: 0;
 }
+
+#board-icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 20;
+}
+
+.icon-btn {
+    background: none;
+    border: 1px solid #9ca3af;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.icon-btn:hover { border-color: var(--text-primary); }
+.icon-btn svg { display: block; }
+
+.hidden { display: none !important; }
 
 /* =======================================
    BUTTONS
